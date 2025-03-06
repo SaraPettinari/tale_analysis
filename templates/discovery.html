@@ -78,15 +78,15 @@
 
     <div class="content">
     <div class="offcanvas offcanvas-start" id="filter-tab">
-        <div class="offcanvas-header">
-            <h5 class="offcanvas-title">Event log: {{ session.file_name }}</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
+        <div class="offcanvas-header bg-secondary text-white">
+            <h5 class="offcanvas-title"><strong>Event Log:</strong> {{ session.file_name }}</h5>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
         </div>
         <div class="offcanvas-body">
             {% if session.fdata %}
-            <div class="card">
-                <div class="card-header">
-                    <h4>Filtering</h4>
+            <div class="card shadow-sm">
+                <div class="card-header bg-tale text-white">
+                    <h4 class="mb-0">Filtering Options</h4>
                 </div>
                 <div class="card-body">
                     {% set filter = session.fdata.filters %}
@@ -94,7 +94,7 @@
                         {% if filter.resources %}
                         <div class="mb-3">
                             <label for="selectRes" class="form-label">
-                                <h5>Resources</h5>
+                                <h6>Select Resource</h6>
                             </label>
                             <select class="form-select" name="resource_option" id="selectRes">
                                 <option value="none" selected>None</option>
@@ -108,7 +108,7 @@
                         {% if filter.cases %}
                         <div class="mb-3">
                             <label for="selectCase" class="form-label">
-                                <h5>Cases</h5>
+                                <h6>Select Case</h6>
                             </label>
                             <select class="form-select" name="case_option" id="selectCase">
                                 <option value="none" selected>None</option>
@@ -120,7 +120,7 @@
                             <input type="hidden" name="file_name" value="{{session.file_name}}" />
                         </div>
                         {% endif %}
-                        <button type="submit" class="btn btn-outline-secondary" title="Log Filtering">Filter!</button>
+                        <button type="submit" class="btn btn-outline-secondary" title="Log Filtering">Apply Filters</button>
                     </form>
                 </div>
             </div>
@@ -199,10 +199,10 @@
                             <div style="display: flex; justify-content: center; align-items: center; gap: 10px;">
                                 <form action="{{ url_for('discovery.discover_dfg') }}" method="POST">
                                     <input type="hidden" name="file_name" value="{{value}}" />
-                                    <button class="btn btn-outline-dark" type="submit">Discover Process</button>
+                                    <button class="btn btn-outline-dark" type="submit">Process Discovery</button>
                                 </form>
                                 <button class="btn btn-outline-dark" title="Please Discover Process" type="button"
-                                    onclick="openNewTab()" id="enhancement_gui" disabled>Enhancement GUI</button>
+                                    onclick="openNewTab()" id="enhancement_gui" disabled>Process Enhancement</button>
                                 <script>
                                     function openNewTab() {
                                         localStorage.setItem('sharedContent', document.getElementById('graph-container').innerHTML);
