@@ -1,7 +1,8 @@
-# TALE analysis #
-TALE analysis implements a graphycal interface to handle robotic system data and analyze them with process mining techniques. This repository contains the tool for performing the process mining-based analysis to discover robots behavior via a DFG.
+# RoboTrace #
+RoboTrace is a graphical interface to handle robotic system data and analyze them with process mining techniques. This repository contains the tool for performing the process mining-based analysis to discover robots behavior via a DFG.
 
-![Tale](/docs/imgs/logo.png)
+![RoboTraceLogo](/static/images/robotrace.png)
+
 
 Please refer to the methodology description for more details: [website](https://pros.unicam.it/tale/) and [paper](https://link.springer.com/chapter/10.1007/978-3-031-46587-1_7).
 
@@ -17,20 +18,20 @@ git clone <repository_link>
 
 **Create a virtual environment**
 ```bash
-python -m venv env
+python -m venv .venv
 ```
 
 **Activate the virtual environment**
 
 _Windows_
 ```bash
-env\Scripts\activate
+.venv\Scripts\activate
 ```
 
 _macOS and Linux_
 
 ```bash
-source env/bin/activate
+source .venv/bin/activate
 ```
 
 **Install dependencies**
