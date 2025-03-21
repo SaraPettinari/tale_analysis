@@ -54,7 +54,6 @@ def create_generalized_dfg(file_path, is_performance=False):
     '''
     log = xes_importer.apply(file_path)
     
-
     # Discover the requested DFG
     if is_performance:
         activity_stats = get_activity_duration(log)
@@ -151,6 +150,51 @@ def get_activity_duration(log):
     return median_durations_dict
 
 
+def get_activity_consumption(file_path, nodes):
+    '''
+    Compute the battery consumption for each activity
+    @param file_path: Path to the event log file
+    '''
+    log = xes_importer.apply(file_path)
+    
+    activity_consumption = []
+    
+    for trace in log:
+    # Dictionary to store start times for each activity
+        start_battery = {}
+        
+        for event in trace:
+            activity = event[cn.ACTIVITY]
+            lifecycle = event[cn.LIFECYCLE]
+            battery = event[cn.BATTERY]
+            
+            # Check if it's a start or complete event
+            if lifecycle == 'start':
+                start_battery[activity] = battery
+            elif lifecycle == 'complete' and activity in start_battery:
+                duration = start_battery[activity] - battery 
+                activity_consumption.append({
+                    'trace_id': trace.attributes['concept:name'],
+                    'activity': activity,
+                    'duration': duration
+                })
+                del start_battery[activity]
+
+    consumption_df = DataFrame(activity_consumption)
+        
+    median_consumption = consumption_df.groupby(['trace_id', 'activity'])['duration'].sum()
+    median_consumption = median_consumption.groupby('activity').median()
+    
+    median_consumption_dict = median_consumption.to_dict() 
+    
+    for node in nodes:
+        node_id = node['id']
+        if node_id in median_consumption_dict:
+            node['energy_consumption'] = median_consumption_dict[node_id]
+            
+    return nodes
+
+            
 ## Color generation
 def hex_to_rgb(hex_color):
     """Convert a hexadecimal color to an RGB tuple."""
@@ -352,9 +396,7 @@ def create_dfg(file_path, filtering_conditions={}):
 
     return (nodes, edges)
 
-
-
-
+'''
 def create_performance_dfg(file_path):
     log = xes_importer.apply(file_path)
     activity_duration = get_activity_duration(log)
@@ -410,3 +452,4 @@ def create_performance_dfg(file_path):
 
     return (nodes, edges)
 
+'''

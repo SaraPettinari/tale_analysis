@@ -21,20 +21,22 @@ function generate_dagre(data) {
     for (n in data.nodes) {
         node = data.nodes[n]
         if (node.label != null) {
-            node.label = node.label.replaceAll("_", "\n")
-            if (node.count){
-                node.label = node.label + "\n (" + node.count + ")"
+            node.label = node.label.replaceAll("_", " ")
+            if (node.count) {
+                node.label = node.label + "\n(" + node.count + ")"
             }
         }
+
         console.log(node)
         if (!node.color) {
             node.color = '{background: #e6e3e3e3}'
         }
 
-        g.setNode(node.id, { 
+        g.setNode(node.id, {
             label: node.label,
             labelStyle: "font-size: 20px; text-align: center;",
-            color: node.color.background
+            color: node.color.background,
+            energy_consumption: node.energy_consumption,
         });
     }
 
@@ -42,6 +44,8 @@ function generate_dagre(data) {
         var node = g.node(v);
 
         node.rx = node.ry = 12;
+
+        node.height = 60;
 
         if (node.label === 'start') {
             node.shape = 'circle';
@@ -56,7 +60,7 @@ function generate_dagre(data) {
             node.shape = 'rect';
             node.style = 'fill: ' + node.color;
         }
-        
+
     });
 
     for (e in data.edges) {
@@ -95,6 +99,7 @@ function generate_dagre(data) {
 
     addOnFunctionalities(svgGroup, g)
 
+    addBatteryBubbles(svgGroup, g);
 
     // Change the graph direction
     d3.select('#toggle-button').on('click', function () {
@@ -307,3 +312,60 @@ function checkToggle() {
 }
 
 setInterval(checkToggle, 5000);
+
+function addBatteryBubbles(svgGroup, g) {
+    svgGroup.selectAll('g.node').each(function (nodeId) {
+        const node = g.node(nodeId);
+        console.log('node', node)
+        if (node.energy_consumption) {
+
+            let rounded = (node.energy_consumption).toFixed(2);  
+            let consumption = parseFloat(rounded);  
+
+            const batteryLevel = consumption || 0; // Default battery % if not provided
+            const nodeHeight = node.height || 40;
+
+            // Attach battery to each node's group
+            const nodeGroup = d3.select(this);
+
+            const barWidth = 60;
+            const barHeight = 8;
+
+            // Background bar (gray)
+            nodeGroup.append('rect')
+                .attr('x', -barWidth / 2)
+                .attr('y', nodeHeight / 2 + 5) // Positioned below the node
+                .attr('width', barWidth)
+                .attr('height', barHeight)
+                .attr('fill', '#ddd')
+                .attr('stroke', '#666')
+                .attr('rx', 4) // Rounded corners
+                .attr('ry', 4)
+                .style('filter', 'drop-shadow(1px 1px 2px rgba(0,0,0,0.3))'); // Subtle shadow
+
+            // Battery fill (inner bar with gradient)
+            nodeGroup.append('rect')
+                .attr('x', -barWidth / 2)
+                .attr('y', nodeHeight / 2 + 5)
+                .attr('width', (barWidth * batteryLevel) / 100)
+                .attr('height', barHeight)
+                .attr('rx', 4)
+                .attr('ry', 4)
+                .attr('fill', batteryLevel < 20
+                    ? '#4caf50' // Green for low battery consumption
+                    : batteryLevel > 60
+                        ? '#E55451' // Red for high battery consumption
+                        : '#FFD700') // Yellow for medium battery consumption
+                .style('transition', 'width 0.5s ease-in-out');
+
+            // Optional: % text under the bar
+            nodeGroup.append('text')
+                .attr('x', 0)
+                .attr('y', nodeHeight / 2 + barHeight + 18)
+                .attr('text-anchor', 'middle')
+                .attr('fill', '#333')
+                .attr('font-size', '12px')
+                .text(`${batteryLevel}%`);
+        }
+    });
+}
