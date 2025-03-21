@@ -197,7 +197,7 @@
                         </td>
                         <td>
                             <div style="display: flex; justify-content: center; align-items: center; gap: 10px;">
-                                <form action="{{ url_for('discovery.discover_dfg') }}" method="POST">
+                                <form action="{{ url_for('discovery.discover', type='frequence') }}" method="POST">
                                     <input type="hidden" name="file_name" value="{{value}}" />
                                     <button class="btn btn-outline-dark" type="submit">Process Discovery</button>
                                 </form>
@@ -234,12 +234,12 @@
             style="background-color: #f8f9fa; border-radius: 8px;">
             <div class="d-flex justify-content-between mb-3">
                 <div class="d-flex gap-2">
-                    <form action="{{ url_for('discovery.discover_dfg') }}" method="POST">
+                    <form action="{{ url_for('discovery.discover', type='frequence') }}" method="POST">
                         <input type="hidden" name="file_name" value="{{value}}" />
                         <button class="btn btn-outline-dark {% if button_pressed == 'btn1' %}btn-purple{% endif %}"
                             type="submit" id="btn1">Frequency Graph</button>
                     </form>
-                    <form action="{{ url_for('discovery.discover_performance') }}" method="POST">
+                    <form action="{{ url_for('discovery.discover', type='performance') }}" method="POST">
                         <input type="hidden" name="file_name" value="{{value}}" />
                         <button class="btn btn-outline-dark {% if button_pressed == 'btn2' %}btn-purple{% endif %}"
                             type="submit" id="btn2">Performance Graph</button>
