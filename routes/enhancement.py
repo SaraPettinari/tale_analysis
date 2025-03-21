@@ -23,14 +23,16 @@ def get_global_plot():
     for key in args_keys:
         if key == 'graph':
             if request.args[key] == cn.PERFORMANCE: # reconstruct the frequency DFG
-                (nodes, edges) = create_performance_dfg(file_path)
+                (nodes, edges) = create_generalized_dfg(file_path, is_performance=True)
                 session[cn.RESP] = {'nodes': nodes, 'edges': edges}
             elif request.args[key] == cn.FREQUENCY: # reconstruct the performance DFG
-                (nodes, edges) = create_dfg(file_path)
+                (nodes, edges) = create_generalized_dfg(file_path, is_performance=False)
                 session[cn.RESP] = {'nodes': nodes, 'edges': edges}
         else: # Create measures plot
             df = xes_to_df(file_path)
-                
+            if key == cn.BATTERY:
+                battery_nodes = get_activity_consumption(file_path, session[cn.RESP]['nodes'])
+                session[cn.RESP]['nodes'] = battery_nodes
             fig_path = get_plot(key, df)
             session[cn.MEASURES][cn.ALL][key] = fig_path
     return render_template(gui_interface)

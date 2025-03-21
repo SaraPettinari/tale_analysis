@@ -2,7 +2,7 @@ import os
 
 from flask import render_template, request, session, Blueprint
 from src.xes_handler import csv_to_xes
-from src.utils import xes_to_df, get_file_path, create_performance_dfg, create_generalized_dfg, store_filtered_log
+from src.utils import xes_to_df, get_file_path, create_generalized_dfg, store_filtered_log
 import src.const as cn
 
 discovery = Blueprint('discovery', __name__)
@@ -130,29 +130,25 @@ def filter_file():
 
         return render_template(gui_interface)
 
-@discovery.route('/discover-activity', methods=['GET', 'POST'])
-def discover_dfg():    
-    
+
+@discovery.route('/discover-<type>', methods=['GET', 'POST'])
+def discover(type):    
     if request.method == 'POST':
         file_name = request.form[cn.FILE]
         file_path = session[cn.FILE_LIST][file_name]
         session[cn.PATH] = file_path
-        (nodes, edges) = create_generalized_dfg(file_path)
+        
+        # See if frequence or performance
+        is_performance = (type == 'performance')
+        
+        # Call the generalized DFG creation function
+        (nodes, edges) = create_generalized_dfg(file_path, is_performance=is_performance)
         session[cn.RESP] = {'nodes': nodes, 'edges': edges}
 
         session['plot_file'] = {}
-        return render_template(gui_interface, button_pressed='btn1')
+        
+        # Render template with the correct button press context
+        button_pressed = 'btn2' if is_performance else 'btn1'
+        return render_template(gui_interface, button_pressed=button_pressed)
 
-
-@discovery.route('/discover-performance', methods=['POST'])
-def discover_performance():    
-    if request.method == 'POST':
-        file_name = request.form[cn.FILE]
-        file_path = session[cn.FILE_LIST][file_name]
-        session[cn.PATH] = file_path
-        (nodes, edges) = create_generalized_dfg(file_path, is_performance=True)
-        session[cn.RESP] = {'nodes': nodes, 'edges': edges}
-
-        session['plot_file'] = {}
-        return render_template(gui_interface, button_pressed='btn2')
 

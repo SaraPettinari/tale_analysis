@@ -34,6 +34,7 @@ def get_space_plot(df, activity_name = None):
                             range_z=[0, 2],
                             )
         # Create the heatmap
+        '''
         fig_heatmap = px.density_heatmap(
             df,
             x='x',
@@ -43,7 +44,7 @@ def get_space_plot(df, activity_name = None):
             hover_data={cn.RESOURCE: True},
             range_x=[0, 10],
             range_y=[0, 10]
-        )
+        )'''
     else:
         activity_name = 'home'
         fig = px.scatter_3d(df, x='x', y='y', z='z',
@@ -54,6 +55,7 @@ def get_space_plot(df, activity_name = None):
                             range_y=[0, 10],
                             range_z=[0, 2],
                             )
+        '''
         # Create the heatmap
         fig_heatmap = px.density_heatmap(
             df,
@@ -63,7 +65,7 @@ def get_space_plot(df, activity_name = None):
             color_continuous_scale="Viridis",
             range_x=[0, 10],
             range_y=[0, 10]
-        )
+        )'''
 
         
     
@@ -87,14 +89,14 @@ def get_space_plot(df, activity_name = None):
         os.makedirs(plot_path)
         
     fig_path_3d = os.path.join(plot_path, out_file_3d)
-    fig_path_heat = os.path.join(plot_path, out_file_heat)
+    #fig_path_heat = os.path.join(plot_path, out_file_heat)
     
     
     fig.write_html(fig_path_3d)
-    fig_heatmap.write_html(fig_path_heat)
+    #fig_heatmap.write_html(fig_path_heat)
     
     plot_list.append(activity_name + '/' + out_file_3d)
-    plot_list.append(activity_name + '/' + out_file_heat)
+    #plot_list.append(activity_name + '/' + out_file_heat)
     
     return plot_list
 
@@ -122,23 +124,49 @@ def get_battery_plot(df):
     t_path = 'home/' + out_file
     template_path.append(t_path)
 
+    '''
     # Create activity plot
-    df = df.sort_values(by=[cn.CASE, cn.ACTIVITY, cn.TIMESTAMP])
+    #df = df.sort_values(by=[cn.CASE, cn.ACTIVITY, cn.TIMESTAMP]).reset_index()
+    
+    df.sort_values([cn.CASE, cn.RESOURCE, cn.ACTIVITY, cn.TIMESTAMP], inplace=True)
 
-    activity_battery = df.pivot_table(
-        index=[cn.CASE, cn.ACTIVITY, cn.RESOURCE],
-        columns=cn.LIFECYCLE,
-        values=cn.BATTERY
+    energy_consumption_records = []
+
+    # Go through each case-resource-activity combination
+    for (case, resource, activity), group in df.groupby([cn.CASE, cn.RESOURCE, cn.ACTIVITY]):
+        start_event = None
+
+        # Loop through events within this group
+        for _, row in group.iterrows():
+            if row['lifecycle:transition'] == 'start':
+                start_event = row
+            elif row['lifecycle:transition'] == 'complete' and start_event is not None:
+                # Calculate battery consumption from start to complete
+                consumption = start_event['battery'] - row['battery']
+                energy_consumption_records.append({
+                    'case:concept:name': case,
+                    'org:resource': resource,
+                    'concept:name': activity,
+                    'energy_consumption': consumption
+                })
+                start_event = None
+
+    # Convert results to a DataFrame
+    result_df = pd.DataFrame(energy_consumption_records)
+
+    # Group and sum battery consumption per case-resource-activity
+    final_result = result_df.groupby([cn.CASE, cn.RESOURCE, cn.ACTIVITY]).agg(
+        total_energy_consumption=('energy_consumption', 'sum')
     ).reset_index()
-    activity_battery['battery_depletion'] = activity_battery['start'] - activity_battery['complete']
-
-    # Calculate the mean battery depletion for each activity and resource across all cases
-    mean_activity_depletion = activity_battery.groupby([cn.ACTIVITY, cn.RESOURCE])['battery_depletion'].mean().reset_index()
-
+    
+    final_result.to_csv('final_result.csv')
+     
+    mean_activity_depletion = final_result.groupby([cn.ACTIVITY, cn.RESOURCE])['total_energy_consumption'].mean().reset_index()
+            
     fig = px.bar(
         mean_activity_depletion,
         x=cn.ACTIVITY,
-        y='battery_depletion',
+        y='total_energy_consumption',
         color=cn.RESOURCE,
         facet_col=cn.RESOURCE,
         title="Mean Battery Discharge per Activity by Resource",
@@ -157,6 +185,7 @@ def get_battery_plot(df):
     a_path = 'home/' + out_file
 
     template_path.append(a_path)
+    '''
     
     return template_path
 
