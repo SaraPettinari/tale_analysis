@@ -72,9 +72,9 @@ def create_generalized_dfg(file_path, is_performance=False):
     # Add start and end nodes
     nodes = [
         {'id': 'start_node', 'label': 'start', 'shape': 'diamond',
-         'size': 10, 'color': {'background': '#ADFF2F', 'border': "#ADFF2F"}},
+         'size': 10, 'color': {'background': '#d1d1d1', 'border': "#ADFF2F"}},
         {'id': 'end_node', 'label': 'end', 'shape': 'diamond',
-         'size': 10, 'color': {'background': '#ff6666', 'border': "#ff6666"}}
+         'size': 10, 'color': {'background': '#d1d1d1', 'border': "#ff6666"}}
     ]
     edges = []
     n_check = set()
@@ -167,6 +167,7 @@ def get_activity_consumption(file_path, nodes):
             activity = event[cn.ACTIVITY]
             lifecycle = event[cn.LIFECYCLE]
             battery = event[cn.BATTERY]
+            resource = event[cn.RESOURCE]
             
             # Check if it's a start or complete event
             if lifecycle == 'start':
@@ -183,7 +184,10 @@ def get_activity_consumption(file_path, nodes):
     consumption_df = DataFrame(activity_consumption)
         
     median_consumption = consumption_df.groupby(['trace_id', 'activity'])['duration'].sum()
+    print(median_consumption)
     median_consumption = median_consumption.groupby('activity').median()
+    print(median_consumption)
+    
     
     median_consumption_dict = median_consumption.to_dict() 
     

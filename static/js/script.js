@@ -50,16 +50,15 @@ function generate_dagre(data) {
         if (node.label === 'start') {
             node.shape = 'circle';
             node.r = 30; // Radius of the circle
-            node.style = 'fill: lightgreen';
+            node.width = node.height = 30;
         } else if (node.label === 'end') {
-            node.shape = 'circle';
-            node.r = 30;
-            node.style = 'fill: #E55451';
+            node.shape = 'rect';
+            node.width = node.height = 30;
         }
         else {
             node.shape = 'rect';
-            node.style = 'fill: ' + node.color;
         }
+        node.style = 'fill: ' + node.color;
 
     });
 
@@ -329,7 +328,7 @@ function addBatteryBubbles(svgGroup, g) {
             const nodeGroup = d3.select(this);
 
             const barWidth = 60;
-            const barHeight = 8;
+            const barHeight = 10;
 
             // Background bar (gray)
             nodeGroup.append('rect')
@@ -343,7 +342,7 @@ function addBatteryBubbles(svgGroup, g) {
                 .attr('ry', 4)
                 .style('filter', 'drop-shadow(1px 1px 2px rgba(0,0,0,0.3))'); // Subtle shadow
 
-            // Battery fill (inner bar with gradient)
+            // Battery fill
             nodeGroup.append('rect')
                 .attr('x', -barWidth / 2)
                 .attr('y', nodeHeight / 2 + 5)
@@ -351,20 +350,14 @@ function addBatteryBubbles(svgGroup, g) {
                 .attr('height', barHeight)
                 .attr('rx', 4)
                 .attr('ry', 4)
-                .attr('fill', batteryLevel < 20
-                    ? '#4caf50' // Green for low battery consumption
-                    : batteryLevel > 60
-                        ? '#E55451' // Red for high battery consumption
-                        : '#FFD700') // Yellow for medium battery consumption
-                .style('transition', 'width 0.5s ease-in-out');
+                .attr('class', `battery-bar battery-bar-fill ${batteryLevel < 20 ? 'low' : batteryLevel > 60 ? 'high' : 'medium'}`)
+                ;
 
-            // Optional: % text under the bar
+            // % text under the bar
             nodeGroup.append('text')
                 .attr('x', 0)
                 .attr('y', nodeHeight / 2 + barHeight + 18)
                 .attr('text-anchor', 'middle')
-                .attr('fill', '#333')
-                .attr('font-size', '12px')
                 .text(`${batteryLevel}%`);
         }
     });

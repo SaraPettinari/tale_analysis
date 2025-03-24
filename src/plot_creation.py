@@ -115,7 +115,7 @@ def get_battery_plot(df):
                 hover_data={cn.ACTIVITY : True},
                 animation_frame=cn.CASE,
                 animation_group=cn.TIMESTAMP,
-                title='Battery Discharge')
+                title='Energy Consumption')
     
     fig_path = os.path.join(plot_path, out_file)
     
@@ -169,8 +169,8 @@ def get_battery_plot(df):
         y='total_energy_consumption',
         color=cn.RESOURCE,
         facet_col=cn.RESOURCE,
-        title="Mean Battery Discharge per Activity by Resource",
-        labels={'battery_depletion': 'Mean Battery Discharge (%)', cn.ACTIVITY: 'Activity'},
+        title="Mean Energy Consumption per Activity by Resource",
+        labels={'battery_depletion': 'Mean Energy Consumption (%)', cn.ACTIVITY: 'Activity'},
     )
     fig.update_layout(
         yaxis_title="Mean Battery Depletion (%)",

@@ -189,8 +189,13 @@ h1 {
   stroke-width: 2px;
 }
 
+.node circle {
+  stroke: #333;
+  stroke-width: 2px;
+}
+
 .node text {
-  font-family: 'Arial', sans-serif;
+  font-family: 'Tahoma', sans-serif;
   font-size: 14px;
   fill: #333;
   /* Text color */
@@ -271,3 +276,28 @@ svg {
   font-family: Tahoma, sans-serif;
   font-size: 30px;
 }
+
+/* Battery Layout */
+.battery-bar-fill.low {
+    fill: #4caf50;
+  }
+  
+  /* Medium consumption (soft yellow) */
+  .battery-bar-fill.medium {
+      fill: #FFB703;
+  }
+  
+  /* High consumption (warm red) */
+  .battery-bar-fill.high {
+      fill: #ef0e0a;
+  }
+
+  .battery-bar-fill {
+    transition: width 0.5s ease-in-out;
+  }
+
+  .battery-bar.text {
+    font-size: 12px;
+    font-family: 'Tahoma', sans-serif;
+    fill: #333;
+  }
