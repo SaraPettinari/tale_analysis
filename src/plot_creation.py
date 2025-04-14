@@ -28,7 +28,7 @@ def get_space_plot(df, activity_name = None):
         fig = px.scatter_3d(filtered_df, x='x', y='y', z='z',
                             color=cn.CASE,
                             symbol=cn.ACTIVITY,
-                            title="Space for: " + activity_name,
+                            title="Space Occupancy for: " + activity_name,
                             range_x=[0, 10],
                             range_y=[0, 10],
                             range_z=[0, 2],
@@ -47,10 +47,14 @@ def get_space_plot(df, activity_name = None):
         )'''
     else:
         activity_name = 'home'
+        if df[cn.RESOURCE].unique().size == 1:
+            this_symbol = cn.ACTIVITY
+        else:  
+            this_symbol = cn.RESOURCE
         fig = px.scatter_3d(df, x='x', y='y', z='z',
                             color=cn.ACTIVITY,
-                            symbol=cn.RESOURCE,
-                            title="Space for MRS - 3D",
+                            symbol=this_symbol,
+                            title="Space Occupancy",
                             range_x=[0, 10],
                             range_y=[0, 10],
                             range_z=[0, 2],
@@ -206,7 +210,9 @@ def get_communication_graph(this_df):
     # Calculate duration
     df['duration'] = (df['complete_time'] - df['start_time']).dt.total_seconds()
     
-    df[cn.ACTIVITY] = [x[0] for x in df[cn.ACTIVITY]]
+    #df[cn.ACTIVITY] = [x[0] for x in df[cn.ACTIVITY]]
+    
+    df = df.drop(df[df[cn.ACTIVITY] == 'takeoff'].index)
     
     activities_counts = df[cn.ACTIVITY].value_counts().reset_index()
     activities_counts.columns = [cn.ACTIVITY, 'received_msgs']
