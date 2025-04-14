@@ -1,17 +1,32 @@
 # RoboTrace #
-RoboTrace is a graphical interface to handle robotic system data and analyze them with process mining techniques. This repository contains the tool for performing the process mining-based analysis to discover robots behavior via a DFG.
+RoboTrace is a graphical interface to handle robotic system data and analyze them with process mining techniques. This repository contains the tool for performing the process mining-based analysis to discover robots behavior via a DFG enhanced with contextual perspectives.
 
 ![RoboTraceLogo](/static/images/robotrace.png)
 
-
-Please refer to the methodology description for more details: [website](https://pros.unicam.it/tale/) and [paper](https://link.springer.com/chapter/10.1007/978-3-031-46587-1_7).
 
 ## Installation
 ```bash
 git clone <repository_link>
 ```
 
-## Requirements
+```bash
+cd /<path>/robotrace
+```
+
+## Docker
+```bash
+docker build -t robotrace .
+```
+
+```bash
+docker-compose up --build
+```
+
+Then open your browser at: http://localhost:8080
+
+## Source Code
+
+### Requirements
 - Python 3.8 or later
 
 ### Python dependecies installation
@@ -44,25 +59,17 @@ source .venv/bin/activate
     pip install -r requirements.txt
     ```
 
-## Run
+### Run
 ```bash
 python3 main.py  
 ```
 
 
-## Example Scenario
 
-### Event log uploading
-![Uploading](/docs/imgs/log_upload.png)
+## References
+* Corradini, F., Pettinari, S., Re, B., Rossi, L., Tiezzi, F. (2024). A Methodology for the Analysis of Robotic Systems via Process Mining. In: Enterprise Design, Operations, and Computing. EDOC 2023. Lecture Notes in Computer Science, vol 14367. Springer. [[🔗 website](https://pros.unicam.it/tale/)] [[📃 paper](https://link.springer.com/chapter/10.1007/978-3-031-46587-1_7)]
 
-### Event log filtering
-This sidebar enables filtering the event log for resource name and/or case identifier.
-![Filtering](/docs/imgs/filtering.png)
 
-## DFG discovery
-DFG of the multi-robot behavior enhanced with the possibility of highlighting incoming and outgoing edges.
-![DFG](/docs/imgs/dfg.png)
+## More Info
+Check out the 📘 [wiki](https://github.com/SaraPettinari/robotrace/wiki) for detailed documentation and usage examples.
 
-## Enhancement
-Enhancement interface showing the communication and spatial perspectives.
-![Enhancement](/docs/imgs/enhancement.png)
