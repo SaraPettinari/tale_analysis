@@ -3,14 +3,22 @@
 <table>
   <tr>
     <td>
-      RoboTrace is a graphical interface to handle robotic system data and analyze them with process mining techniques. This repository contains the tool for performing the process mining-based analysis to discover robots behavior via a DFG enhanced with contextual perspectives.
+      <img src="/static/images/robotrace.png" alt="RoboTraceLogo" width="150"/>
     </td>
     <td>
-      <img src="/static/images/robotrace.png" alt="RoboTraceLogo" width="150"/>
+      RoboTrace is a graphical interface to handle robotic system data and analyze them with process mining techniques. This repository contains the tool for performing the process mining-based analysis to discover robots behavior via a DFG enhanced with contextual perspectives.
     </td>
   </tr>
 </table>
 
+## Table of Contents
+
+- [Installation](#installation)
+- [More Info](#more-info)
+- [References](#references)
+- [Contact](#contact)
+- [Contributing](#contributing)
+- [License](#license)
 
 ## Installation
 ```bash
@@ -72,14 +80,16 @@ source .venv/bin/activate
 python3 main.py  
 ```
 
+## More Info
+Check out the 📘 [wiki](https://github.com/SaraPettinari/robotrace/wiki) for detailed documentation and usage examples
 
 
 ## References
 * Corradini, F., Pettinari, S., Re, B., Rossi, L., Tiezzi, F. (2024). A Methodology for the Analysis of Robotic Systems via Process Mining. In: Enterprise Design, Operations, and Computing. EDOC 2023. Lecture Notes in Computer Science, vol 14367. Springer. [[🔗 website](https://pros.unicam.it/tale/)] [[📃 paper](https://link.springer.com/chapter/10.1007/978-3-031-46587-1_7)]
 
 
-## More Info
-Check out the 📘 [wiki](https://github.com/SaraPettinari/robotrace/wiki) for detailed documentation and usage examples
-
 ## Contact
 ✉️ Sara Pettinari (Gran Sasso Science Institute) - sara.pettinari@gssi.it
+
+## License
+Check License [here](https://github.com/SaraPettinari/robotrace/blob/main-2.0/LICENSE).
