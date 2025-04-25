@@ -1,7 +1,15 @@
 # RoboTrace #
-RoboTrace is a graphical interface to handle robotic system data and analyze them with process mining techniques. This repository contains the tool for performing the process mining-based analysis to discover robots behavior via a DFG enhanced with contextual perspectives.
 
-![RoboTraceLogo](/static/images/robotrace.png)
+<table>
+  <tr>
+    <td>
+      RoboTrace is a graphical interface to handle robotic system data and analyze them with process mining techniques. This repository contains the tool for performing the process mining-based analysis to discover robots behavior via a DFG enhanced with contextual perspectives.
+    </td>
+    <td>
+      <img src="/static/images/robotrace.png" alt="RoboTraceLogo" width="150"/>
+    </td>
+  </tr>
+</table>
 
 
 ## Installation
@@ -13,7 +21,7 @@ git clone <repository_link>
 cd /<path>/robotrace
 ```
 
-## Docker
+### Docker
 ```bash
 docker build -t robotrace .
 ```
@@ -24,12 +32,12 @@ docker-compose up --build
 
 Then open your browser at: http://localhost:8080
 
-## Source Code
+### Source Code
 
-### Requirements
+#### Requirements
 - Python 3.8 or later
 
-### Python dependecies installation
+#### Python dependecies installation
 
 **Create a virtual environment**
 ```bash
@@ -59,7 +67,7 @@ source .venv/bin/activate
     pip install -r requirements.txt
     ```
 
-### Run
+#### Run
 ```bash
 python3 main.py  
 ```
@@ -71,5 +79,7 @@ python3 main.py
 
 
 ## More Info
-Check out the 📘 [wiki](https://github.com/SaraPettinari/robotrace/wiki) for detailed documentation and usage examples.
+Check out the 📘 [wiki](https://github.com/SaraPettinari/robotrace/wiki) for detailed documentation and usage examples
 
+## Contact
+✉️ Sara Pettinari (Gran Sasso Science Institute) - sara.pettinari@gssi.it

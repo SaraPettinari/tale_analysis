@@ -40,7 +40,11 @@
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
         <div class="container-fluid">
-            <a class="navbar-brand" style="font-size: 1.5rem;" href="/">RoboTrace-discovery</a>
+            <a class="navbar-brand" style="font-size: 1.5rem;" href="/">
+                <img src="{{ url_for('static', filename='images/robotrace.png') }}" alt="Logo" width="22" height="30"
+                    class="d-inline-block align-text-top me-2">
+                RoboTrace-discovery
+            </a>
         </div>
     </nav>
 
@@ -77,208 +81,211 @@
     </div>
 
     <div class="content">
-    <div class="offcanvas offcanvas-start" id="filter-tab">
-        <div class="offcanvas-header bg-secondary text-white">
-            <h5 class="offcanvas-title"><strong>Event Log:</strong> {{ session.file_name }}</h5>
-            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-        </div>
-        <div class="offcanvas-body">
-            {% if session.fdata %}
-            <div class="card shadow-sm">
-                <div class="card-header bg-tale text-white">
-                    <h4 class="mb-0">Filtering Options</h4>
-                </div>
-                <div class="card-body">
-                    {% set filter = session.fdata.filters %}
-                    <form id="filters" action="{{url_for('discovery.filter_file')}}" method="GET">
-                        {% if filter.resources %}
-                        <div class="mb-3">
-                            <label for="selectRes" class="form-label">
-                                <h6>Select Resource</h6>
-                            </label>
-                            <select class="form-select" name="resource_option" id="selectRes">
-                                <option value="none" selected>None</option>
-                                {% for resource in filter.resources %}
-                                <option value="{{resource}}" {% if resource_opt==resource %} selected {% endif %}>{{
-                                    resource }}</option>
-                                {% endfor %}
-                            </select>
-                        </div>
-                        {% endif %}
-                        {% if filter.cases %}
-                        <div class="mb-3">
-                            <label for="selectCase" class="form-label">
-                                <h6>Select Case</h6>
-                            </label>
-                            <select class="form-select" name="case_option" id="selectCase">
-                                <option value="none" selected>None</option>
-                                {% for case in filter.cases %}
-                                <option value="{{case}}" {% if case_opt==case %} selected {% endif %}>{{ case }}
-                                </option>
-                                {% endfor %}
-                            </select>
-                            <input type="hidden" name="file_name" value="{{session.file_name}}" />
-                        </div>
-                        {% endif %}
-                        <button type="submit" class="btn btn-outline-secondary" title="Log Filtering">Apply Filters</button>
-                    </form>
-                </div>
+        <div class="offcanvas offcanvas-start" id="filter-tab">
+            <div class="offcanvas-header bg-secondary text-white">
+                <h5 class="offcanvas-title"><strong>Event Log:</strong> {{ session.file_name }}</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="offcanvas"
+                    aria-label="Close"></button>
             </div>
-            {% endif %}
-        </div>
-    </div>
-
-    <div class="container-fluid mt-3">
-        <div class="collapse" id="collapseInput">
-            <div class="row justify-content-center">
-                <div class="col-lg-6 col-md-8 mb-4">
-                    <div class="card shadow-sm">
-                        <div class="card-header bg-tale text-white">
-                            <h5 class="mb-0">Upload</h5>
-                        </div>
-                        <div class="card-body text-center">
-                            <p class="mb-3"> Upload Event Log</p>
-                            <form action="select-logs" method="POST" enctype="multipart/form-data">
-                                <label hidden for="file" class="form-label">Choose File</label>
-                                <div class="input-group">
-                                    <input class="form-control" type="file" name="file" id="file" />
-                                    <button class="btn btn-tale" type="submit">Upload</button>
-                                </div>
-                            </form>
-                        </div>
+            <div class="offcanvas-body">
+                {% if session.fdata %}
+                <div class="card shadow-sm">
+                    <div class="card-header bg-tale text-white">
+                        <h4 class="mb-0">Filtering Options</h4>
+                    </div>
+                    <div class="card-body">
+                        {% set filter = session.fdata.filters %}
+                        <form id="filters" action="{{url_for('discovery.filter_file')}}" method="GET">
+                            {% if filter.resources %}
+                            <div class="mb-3">
+                                <label for="selectRes" class="form-label">
+                                    <h6>Select Resource</h6>
+                                </label>
+                                <select class="form-select" name="resource_option" id="selectRes">
+                                    <option value="none" selected>None</option>
+                                    {% for resource in filter.resources %}
+                                    <option value="{{resource}}" {% if resource_opt==resource %} selected {% endif %}>{{
+                                        resource }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            {% endif %}
+                            {% if filter.cases %}
+                            <div class="mb-3">
+                                <label for="selectCase" class="form-label">
+                                    <h6>Select Case</h6>
+                                </label>
+                                <select class="form-select" name="case_option" id="selectCase">
+                                    <option value="none" selected>None</option>
+                                    {% for case in filter.cases %}
+                                    <option value="{{case}}" {% if case_opt==case %} selected {% endif %}>{{ case }}
+                                    </option>
+                                    {% endfor %}
+                                </select>
+                                <input type="hidden" name="file_name" value="{{session.file_name}}" />
+                            </div>
+                            {% endif %}
+                            <button type="submit" class="btn btn-outline-secondary" title="Log Filtering">Apply
+                                Filters</button>
+                        </form>
                     </div>
                 </div>
-                <div class="col-lg-5 col-md-8 mb-4">
-                    <div class="card shadow-sm">
-                        <div class="card-header bg-csv text-white">
-                            <h5 class="mb-0">Parse</h5>
-                        </div>
-                        <div class="card-body text-center">
-                            <p class="mb-3"><strong>OR</strong> use the CSV Parser</p>
-                            <button class="btn btn-csv w-100" id="uploadBtn">CSV Parser</button>
-                            <div id="uploadDialog" class="mt-3" style="display: none;">
-                                <form action="{{ url_for('discovery.csv_processing') }}" method="POST"
-                                    enctype="multipart/form-data">
-                                    <label hidden for="csv-file" class="form-label">Upload CSV File</label>
+                {% endif %}
+            </div>
+        </div>
+
+        <div class="container-fluid mt-3">
+            <div class="collapse" id="collapseInput">
+                <div class="row justify-content-center">
+                    <div class="col-lg-6 col-md-8 mb-4">
+                        <div class="card shadow-sm">
+                            <div class="card-header bg-tale text-white">
+                                <h5 class="mb-0">Upload</h5>
+                            </div>
+                            <div class="card-body text-center">
+                                <p class="mb-3"> Upload Event Log</p>
+                                <form action="select-logs" method="POST" enctype="multipart/form-data">
+                                    <label hidden for="file" class="form-label">Choose File</label>
                                     <div class="input-group">
-                                        <input class="form-control" type="file" name="csv-file" id="csv-file">
-                                        <button type="submit" class="btn btn-csv">Parse</button>
+                                        <input class="form-control" type="file" name="file" id="file" />
+                                        <button class="btn btn-tale" type="submit">Upload</button>
                                     </div>
                                 </form>
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-
-    {% if session.file_name %}
-    <div class="container-fluid mt-3">
-        <div class="card shadow-sm p-4">
-            <table class="table text-center">
-                <thead>
-                    <tr>
-                        <th scope="col">Event Log</th>
-                        <th scope="col">Actions</th>
-                        <th scope="col">Analysis</th>
-                        <th scope="col"></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% set value = session.file_name %}
-                    <tr id="{{ value }}">
-                        <td>{{ value }}</td>
-                        <td>
-                            <button class="btn btn-outline-dark" type="button" data-bs-toggle="offcanvas"
-                                data-bs-target="#filter-tab"><i class="fa fa-filter" aria-hidden="true"></i> Filter
-                                Log</button>
-                        </td>
-                        <td>
-                            <div style="display: flex; justify-content: center; align-items: center; gap: 10px;">
-                                <form action="{{ url_for('discovery.discover', type='frequence') }}" method="POST">
-                                    <input type="hidden" name="file_name" value="{{value}}" />
-                                    <button class="btn btn-outline-dark" type="submit">Process Discovery</button>
-                                </form>
-                                <button class="btn btn-outline-dark" title="Please Discover Process" type="button"
-                                    onclick="openNewTab()" id="enhancement_gui" disabled>Process Enhancement</button>
-                                <script>
-                                    function openNewTab() {
-                                        localStorage.setItem('sharedContent', document.getElementById('graph-container').innerHTML);
-                                        window.open("{{ url_for('enhancement.measurements_gui') }}", "_blank");
-                                    }
-                                </script>
+                    <div class="col-lg-5 col-md-8 mb-4">
+                        <div class="card shadow-sm">
+                            <div class="card-header bg-csv text-white">
+                                <h5 class="mb-0">Parse</h5>
                             </div>
-                        </td>
-                        <td>
-                            <form action="{{ url_for('discovery.init') }}" method="POST">
-                                <input type="hidden" name="delete_file" value="true">
-                                <input type="hidden" name="file_name" value="{{value}}" />
-                                <button type="submit" class="btn btn-outline-danger" title="Delete Log"><i
-                                        class="fa fa-close"></i></button>
-                            </form>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    {% endif %}
-
-
-    {% if session['response_data'] != "" %}
-    <div class="container-fluid mt-4">
-        <div class="card shadow-sm p-4 mb-4" id="graph-container"
-            style="background-color: #f8f9fa; border-radius: 8px;">
-            <div class="d-flex justify-content-between mb-3">
-                <div class="d-flex gap-2">
-                    <form action="{{ url_for('discovery.discover', type='frequence') }}" method="POST">
-                        <input type="hidden" name="file_name" value="{{value}}" />
-                        <button class="btn btn-outline-dark {% if button_pressed == 'btn1' %}btn-purple{% endif %}"
-                            type="submit" id="btn1">Frequency Graph</button>
-                    </form>
-                    <form action="{{ url_for('discovery.discover', type='performance') }}" method="POST">
-                        <input type="hidden" name="file_name" value="{{value}}" />
-                        <button class="btn btn-outline-dark {% if button_pressed == 'btn2' %}btn-purple{% endif %}"
-                            type="submit" id="btn2">Performance Graph</button>
-                    </form>
-                </div>
-
-                <div class="d-flex gap-2">
-                    <button id="toggle-button" class="btn btn-outline-secondary" title="Change Graph Direction">
-                        <i class="fa fa-repeat" aria-hidden="true"></i> Toggle Direction
-                    </button>
-                    <button onclick="downloadGraph()" class="btn btn-outline-secondary" title="Download SVG">
-                        <i class="fa fa-download" aria-hidden="true"></i> Download SVG
-                    </button>
+                            <div class="card-body text-center">
+                                <p class="mb-3"><strong>OR</strong> use the CSV Parser</p>
+                                <button class="btn btn-csv w-100" id="uploadBtn">CSV Parser</button>
+                                <div id="uploadDialog" class="mt-3" style="display: none;">
+                                    <form action="{{ url_for('discovery.csv_processing') }}" method="POST"
+                                        enctype="multipart/form-data">
+                                        <label hidden for="csv-file" class="form-label">Upload CSV File</label>
+                                        <div class="input-group">
+                                            <input class="form-control" type="file" name="csv-file" id="csv-file">
+                                            <button type="submit" class="btn btn-csv">Parse</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
-
         </div>
-    </div>
-    {% endif %}
 
 
-
-    <div hidden class="row card-columns">
-        <div class="card">
-            <script>
-                const response_data = {{ session.response_data|default ("") | tojson }}
-                generate_dagre(response_data)
-                console.log('rd', response_data)
-                if (response_data == '') {
-                    document.getElementById('enhancement_gui').disabled = true;
-                } else {
-                    document.getElementById('enhancement_gui').disabled = false;
-                    document.getElementById('enhancement_gui').title = "Open Multi-Perspective Interface"
-                }
-            </script>
+        {% if session.file_name %}
+        <div class="container-fluid mt-3">
+            <div class="card shadow-sm p-4">
+                <table class="table text-center">
+                    <thead>
+                        <tr>
+                            <th scope="col">Event Log</th>
+                            <th scope="col">Actions</th>
+                            <th scope="col">Analysis</th>
+                            <th scope="col"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% set value = session.file_name %}
+                        <tr id="{{ value }}">
+                            <td>{{ value }}</td>
+                            <td>
+                                <button class="btn btn-outline-dark" type="button" data-bs-toggle="offcanvas"
+                                    data-bs-target="#filter-tab"><i class="fa fa-filter" aria-hidden="true"></i> Filter
+                                    Log</button>
+                            </td>
+                            <td>
+                                <div style="display: flex; justify-content: center; align-items: center; gap: 10px;">
+                                    <form action="{{ url_for('discovery.discover', type='frequence') }}" method="POST">
+                                        <input type="hidden" name="file_name" value="{{value}}" />
+                                        <button class="btn btn-outline-dark" type="submit">Process Discovery</button>
+                                    </form>
+                                    <button class="btn btn-outline-dark" title="Please Discover Process" type="button"
+                                        onclick="openNewTab()" id="enhancement_gui" disabled>Process
+                                        Enhancement</button>
+                                    <script>
+                                        function openNewTab() {
+                                            localStorage.setItem('sharedContent', document.getElementById('graph-container').innerHTML);
+                                            window.open("{{ url_for('enhancement.measurements_gui') }}", "_blank");
+                                        }
+                                    </script>
+                                </div>
+                            </td>
+                            <td>
+                                <form action="{{ url_for('discovery.init') }}" method="POST">
+                                    <input type="hidden" name="delete_file" value="true">
+                                    <input type="hidden" name="file_name" value="{{value}}" />
+                                    <button type="submit" class="btn btn-outline-danger" title="Delete Log"><i
+                                            class="fa fa-close"></i></button>
+                                </form>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
-    </div>
 
-</div>
+        {% endif %}
+
+
+        {% if session['response_data'] != "" %}
+        <div class="container-fluid mt-4">
+            <div class="card shadow-sm p-4 mb-4" id="graph-container"
+                style="background-color: #f8f9fa; border-radius: 8px;">
+                <div class="d-flex justify-content-between mb-3">
+                    <div class="d-flex gap-2">
+                        <form action="{{ url_for('discovery.discover', type='frequence') }}" method="POST">
+                            <input type="hidden" name="file_name" value="{{value}}" />
+                            <button class="btn btn-outline-dark {% if button_pressed == 'btn1' %}btn-purple{% endif %}"
+                                type="submit" id="btn1">Frequency Graph</button>
+                        </form>
+                        <form action="{{ url_for('discovery.discover', type='performance') }}" method="POST">
+                            <input type="hidden" name="file_name" value="{{value}}" />
+                            <button class="btn btn-outline-dark {% if button_pressed == 'btn2' %}btn-purple{% endif %}"
+                                type="submit" id="btn2">Performance Graph</button>
+                        </form>
+                    </div>
+
+                    <div class="d-flex gap-2">
+                        <button id="toggle-button" class="btn btn-outline-secondary" title="Change Graph Direction">
+                            <i class="fa fa-repeat" aria-hidden="true"></i> Toggle Direction
+                        </button>
+                        <button onclick="downloadGraph()" class="btn btn-outline-secondary" title="Download SVG">
+                            <i class="fa fa-download" aria-hidden="true"></i> Download SVG
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+        {% endif %}
+
+
+
+        <div hidden class="row card-columns">
+            <div class="card">
+                <script>
+                    const response_data = {{ session.response_data|default ("") | tojson }}
+                    generate_dagre(response_data)
+                    console.log('rd', response_data)
+                    if (response_data == '') {
+                        document.getElementById('enhancement_gui').disabled = true;
+                    } else {
+                        document.getElementById('enhancement_gui').disabled = false;
+                        document.getElementById('enhancement_gui').title = "Open Multi-Perspective Interface"
+                    }
+                </script>
+            </div>
+        </div>
+
+    </div>
     <script>
         document.getElementById('uploadBtn').addEventListener('click', function () {
             this.style.display = 'none';
