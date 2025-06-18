@@ -35,7 +35,7 @@ docker build -t robotrace .
 ```
 
 ```bash
-docker-compose up --build
+docker run -d -p 127.0.0.1:8080:8080 robotrace
 ```
 
 Then open your browser at: http://localhost:8080
