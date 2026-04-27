@@ -81,13 +81,38 @@ def create_generalized_dfg(file_path, is_performance=False):
 
     # Generate colors based on activity counts
     colors = generate_color(activity_stats, is_performance=is_performance)
+    raw_edge_values = []
+
+    for (node_1, node_2), dfg_data in dfg.items():
+        if is_performance:
+            raw_edge_values.append(round(dfg_data['mean'], 2))
+        else:
+            raw_edge_values.append(dfg_data)
+
+    max_edge_value = max(raw_edge_values, default=0)
 
     for (node_1, node_2), dfg_data in dfg.items():
         # Append start and end activities
         if node_1 in start_activities:
-            edges.append({'from': 'start_node', 'to': node_1, 'label': start_activities[node_1], 'dashes': True})
+            start_count = start_activities[node_1]
+            start_label = 'instant' if is_performance else start_count
+            edges.append({
+                'from': 'start_node',
+                'to': node_1,
+                'label': start_label,
+                'dashes': True,
+                'width': get_edge_width(start_count, max_edge_value, start_label)
+            })
         if node_2 in end_activities:
-            edges.append({'from': node_2, 'to': 'end_node', 'label': end_activities[node_2], 'dashes': True})
+            end_count = end_activities[node_2]
+            end_label = 'instant' if is_performance else end_count
+            edges.append({
+                'from': node_2,
+                'to': 'end_node',
+                'label': end_label,
+                'dashes': True,
+                'width': get_edge_width(end_count, max_edge_value, end_label)
+            })
 
         # Add nodes if not already added
         for node in [node_1, node_2]:
@@ -101,11 +126,29 @@ def create_generalized_dfg(file_path, is_performance=False):
         if is_performance:
             mean_sec = round(dfg_data['mean'], 2)
             label = f"{mean_sec}s" if mean_sec > 0 else 'instant'
-            edges.append({'from': node_1, 'to': node_2, 'label': label, 'width': mean_sec / 20})
+            edges.append({
+                'from': node_1,
+                'to': node_2,
+                'label': label,
+                'width': get_edge_width(mean_sec, max_edge_value, label)
+            })
         else:
-            edges.append({'from': node_1, 'to': node_2, 'label': str(dfg_data)})
+            edges.append({
+                'from': node_1,
+                'to': node_2,
+                'label': str(dfg_data),
+                'width': get_edge_width(dfg_data, max_edge_value, str(dfg_data))
+            })
 
     return nodes, edges
+
+
+def get_edge_width(value, max_value, label=None, min_width=2, max_width=10):
+    if label == 'instant' or max_value <= 0 or value <= 0:
+        return min_width
+
+    normalized_value = value / max_value
+    return round(min_width + (normalized_value * (max_width - min_width)), 2)
 
 
 

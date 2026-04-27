@@ -115,9 +115,10 @@ def filter_file():
                 filtering_conditions[cn.RESOURCE] = res_opt
                 session['resource_opt'] = res_opt
             if case_opt != 'none':
-                selected_case = int(case_opt)
+                #selected_case = int(case_opt)
+                selected_case = case_opt if not case_opt.isdigit() else int(case_opt)
                 filtering_conditions[cn.CASE] = selected_case
-                session['case_opt'] = int(case_opt)
+                session['case_opt'] = selected_case
 
             outfile = store_filtered_log(file_path, filtering_conditions)
             

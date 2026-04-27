@@ -17,6 +17,15 @@ def get_plot(measure, df):
     elif measure == cn.BATTERY:
         return get_battery_plot(df)
 
+
+def _get_axis_range(df, column, default_max):
+    max_value = df[column].max()
+
+    if pd.isna(max_value):
+        max_value = default_max
+
+    return [0, max(default_max, max_value)]
+
 def get_space_plot(df, activity_name = None):
     plot_list = []
     out_file_3d = "space_plot_3d.html"
@@ -24,14 +33,17 @@ def get_space_plot(df, activity_name = None):
     
     if activity_name != None:
         filtered_df = df[df[cn.ACTIVITY] == activity_name]
+        range_x = _get_axis_range(filtered_df, 'x', 10)
+        range_y = _get_axis_range(filtered_df, 'y', 10)
+        range_z = _get_axis_range(filtered_df, 'z', 2)
         
         fig = px.scatter_3d(filtered_df, x='x', y='y', z='z',
                             color=cn.CASE,
                             symbol=cn.ACTIVITY,
                             title="Space Occupancy for: " + activity_name,
-                            range_x=[0, 10],
-                            range_y=[0, 10],
-                            range_z=[0, 2],
+                            range_x=range_x,
+                            range_y=range_y,
+                            range_z=range_z,
                             )
         # Create the heatmap
         '''
@@ -51,13 +63,16 @@ def get_space_plot(df, activity_name = None):
             this_symbol = cn.ACTIVITY
         else:  
             this_symbol = cn.RESOURCE
+        range_x = _get_axis_range(df, 'x', 10)
+        range_y = _get_axis_range(df, 'y', 10)
+        range_z = _get_axis_range(df, 'z', 2)
         fig = px.scatter_3d(df, x='x', y='y', z='z',
                             color=cn.ACTIVITY,
                             symbol=this_symbol,
                             title="Space Occupancy",
-                            range_x=[0, 10],
-                            range_y=[0, 10],
-                            range_z=[0, 2],
+                            range_x=range_x,
+                            range_y=range_y,
+                            range_z=range_z,
                             )
         '''
         # Create the heatmap

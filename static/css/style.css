@@ -204,6 +204,7 @@ h1 {
 /* Edge styles */
 .edgePath path {
   stroke: #999; /* Edge color */
+  fill: none;
   stroke-width: 2px;
   transition: stroke 0.3s; /* Add transition for smoother color change */
 }

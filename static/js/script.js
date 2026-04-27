@@ -1,5 +1,88 @@
 uploaded_files = null;
 
+function getNumericEdgeValue(label) {
+    if (typeof label === 'number') {
+        return label;
+    }
+    else if (typeof label !== 'string') {
+        return 0;
+    }
+
+    const parsedValue = parseFloat(String(label).replace(/[^0-9.]/g, ''));
+    return Number.isFinite(parsedValue) ? parsedValue : 0;
+}
+
+function getEdgeWidth(edge) {
+    if (edge.width != null) {
+        return edge.width;
+    }
+
+    const numericValue = getNumericEdgeValue(edge.label);
+    if (numericValue <= 0) {
+        return 2;
+    }
+
+    return Math.min(Math.max(2 + numericValue / 10, 2), 10);
+}
+
+function getEdgeStyle(edge) {
+    let style = 'stroke-width: ' + getEdgeWidth(edge) + 'px;';
+
+    if (edge.dashes) {
+        style += ' stroke-dasharray: 6,4;';
+    }
+
+    return style;
+}
+
+function getMarkerIdFromPath(pathSelection) {
+    const markerUrl = pathSelection.attr('marker-end');
+    if (!markerUrl) {
+        return null;
+    }
+
+    const markerMatch = markerUrl.match(/#([^)]+)\)?$/);
+    return markerMatch ? markerMatch[1] : null;
+}
+
+function setArrowheadColor(svgGroup, pathSelection, color) {
+    const markerId = getMarkerIdFromPath(pathSelection);
+    if (!markerId) {
+        return;
+    }
+
+    svgGroup.select(`#${markerId} path`)
+        .style('fill', color)
+        .style('stroke', color);
+}
+
+function setEdgeColor(svgGroup, pathSelection, color) {
+    pathSelection.style('stroke', color);
+    setArrowheadColor(svgGroup, pathSelection, color);
+}
+
+function resetEdgeStyles(svgGroup) {
+    svgGroup.selectAll('g.edgePath path').each(function () {
+        setEdgeColor(svgGroup, d3.select(this), '#999');
+    });
+}
+
+function tuneArrowheads(svgGroup) {
+    svgGroup.selectAll('marker')
+        .attr('markerUnits', 'userSpaceOnUse')
+        .attr('markerWidth', 20)
+        .attr('markerHeight', 20)
+        .attr('viewBox', '0 0 10 10')
+        .attr('refX', 8)
+        .attr('refY', 5)
+        .attr('orient', 'auto');
+
+    svgGroup.selectAll('marker path')
+        .style('fill', '#999')
+        .style('stroke', '#999');
+}
+
+
 function generate_dagre(data) {
     console.log('graph', data)
 
@@ -70,6 +153,7 @@ function generate_dagre(data) {
             label: edge_label,
             name: edge.from + '-' + edge_label + '-' + edge.to,
             curve: d3.curveBasis,
+            style: getEdgeStyle(edge),
             labelpos: 'c', // label position to center
             labeloffset: -15, // y offset to decrease edge-label separation
         })
@@ -95,6 +179,7 @@ function generate_dagre(data) {
     // Render the graph
     const render = new dagreD3.render();
     render(svgGroup, g);
+    tuneArrowheads(svgGroup);
 
     addOnFunctionalities(svgGroup, g)
 
@@ -130,6 +215,7 @@ function generate_dagre(data) {
         const render = new dagreD3.render();
 
         render(svgGroup, g);
+        tuneArrowheads(svgGroup);
         addOnFunctionalities(svgGroup, g)
 
     });
@@ -143,7 +229,13 @@ function generate_dagre(data) {
 function addOnFunctionalities(svgGroup, g) {
     // Add unique IDs to the edge paths during rendering
     svgGroup.selectAll('g.edgePath path')
-        .attr('id', (edgeId) => g.edge(edgeId).name);
+        .attr('id', (edgeId) => g.edge(edgeId).name)
+        .on('mouseenter', function () {
+            setEdgeColor(svgGroup, d3.select(this), '#5001b8');
+        })
+        .on('mouseleave', function () {
+            setEdgeColor(svgGroup, d3.select(this), '#999');
+        });
 
     // Handle double click on nodes
     svgGroup.selectAll('g.node')
@@ -152,15 +244,17 @@ function addOnFunctionalities(svgGroup, g) {
             event.stopPropagation(); // Prevent click event from triggering as well
 
             // Reset the style of all edges
-            svgGroup.selectAll('g.edgePath path').style('stroke', '#999');
+            resetEdgeStyles(svgGroup);
 
             // Highlight outgoing edges from the double-clicked node
             g.outEdges(nodeId).forEach(edge => {
-                svgGroup.selectAll(`g.edgePath path[id="${g.edge(edge).name}"]`).style('stroke', '#E55451');
+                const edgePath = svgGroup.select(`g.edgePath path[id="${g.edge(edge).name}"]`);
+                setEdgeColor(svgGroup, edgePath, '#E55451');
             });
             // Highlight incoming edges from the double-clicked node
             g.inEdges(nodeId).forEach(edge => {
-                svgGroup.selectAll(`g.edgePath path[id="${g.edge(edge).name}"]`).style('stroke', 'lightgreen');
+                const edgePath = svgGroup.select(`g.edgePath path[id="${g.edge(edge).name}"]`);
+                setEdgeColor(svgGroup, edgePath, 'lightgreen');
             });
         });
 
@@ -203,7 +297,7 @@ function addOnFunctionalities(svgGroup, g) {
     // Hide the context menu on document click
     d3.select(document).on('click', function () {
         contextMenu.style('display', 'none');
-        svgGroup.selectAll('g.edgePath path').style('stroke', '#999');
+        resetEdgeStyles(svgGroup);
 
     });
 }
