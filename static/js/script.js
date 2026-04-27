@@ -1,4 +1,5 @@
 uploaded_files = null;
+let showRobotClouds = true;
 
 function getNumericEdgeValue(label) {
     if (typeof label === 'number') {
@@ -82,6 +83,57 @@ function tuneArrowheads(svgGroup) {
         .style('stroke', '#999');
 }
 
+function renderRobotClouds(svgGroup, g) {
+    svgGroup.selectAll('.robot-cloud').remove();
+
+    if (!showRobotClouds) {
+        return;
+    }
+
+    g.nodes().forEach(function (nodeId) {
+        const node = g.node(nodeId);
+
+        if (!node || !node.resources || node.resources.length === 0) {
+            return;
+        }
+
+        const resourceLabel = node.resources.join(', ');
+        const cloudGroup = svgGroup.append('g')
+            .attr('class', 'robot-cloud')
+            .attr('transform', `translate(${node.x}, ${node.y - (node.height / 2) - 18})`)
+            .style('pointer-events', 'none');
+
+        const text = cloudGroup.append('text')
+            .attr('class', 'robot-cloud-text')
+            .attr('text-anchor', 'middle')
+            .attr('dy', '0.35em')
+            .text(resourceLabel);
+
+        const textBox = text.node().getBBox();
+
+        cloudGroup.insert('rect', 'text')
+            .attr('class', 'robot-cloud-bg')
+            .attr('x', textBox.x - 8)
+            .attr('y', textBox.y - 4)
+            .attr('width', textBox.width + 16)
+            .attr('height', textBox.height + 8)
+            .attr('rx', 12)
+            .attr('ry', 12);
+    });
+}
+
+function updateRobotToggleButton() {
+    const toggleButton = document.getElementById('robot-toggle-button');
+
+    if (!toggleButton) {
+        return;
+    }
+
+    toggleButton.classList.toggle('active', showRobotClouds);
+    toggleButton.setAttribute('aria-pressed', String(showRobotClouds));
+    toggleButton.setAttribute('title', showRobotClouds ? 'Hide Robot IDs' : 'Show Robot IDs');
+}
+
 
 function generate_dagre(data) {
     console.log('graph', data)
@@ -120,6 +172,7 @@ function generate_dagre(data) {
             labelStyle: "font-size: 20px; text-align: center;",
             color: node.color.background,
             energy_consumption: node.energy_consumption,
+            resources: node.resources,
         });
     }
 
@@ -161,13 +214,13 @@ function generate_dagre(data) {
 
     console.log('g', g)
     const svg = d3.select('#graph-container').append('svg');
-    const svgGroup = svg.append('g');
+    let currentSvgGroup = svg.append('g');
 
     let initialZoomState;
 
     // Create a zoom behavior
     const zoom = d3.zoom().on('zoom', (event) => {
-        svgGroup.attr('transform', event.transform);
+        currentSvgGroup.attr('transform', event.transform);
     });
 
     // Apply zoom to the SVG container
@@ -177,13 +230,17 @@ function generate_dagre(data) {
 
 
     // Render the graph
-    const render = new dagreD3.render();
-    render(svgGroup, g);
-    tuneArrowheads(svgGroup);
+    function renderGraph(svgGroup) {
+        const render = new dagreD3.render();
+        render(svgGroup, g);
+        tuneArrowheads(svgGroup);
+        renderRobotClouds(svgGroup, g);
+        updateRobotToggleButton();
+        addOnFunctionalities(svgGroup, g)
+        addBatteryBubbles(svgGroup, g);
+    }
 
-    addOnFunctionalities(svgGroup, g)
-
-    addBatteryBubbles(svgGroup, g);
+    renderGraph(currentSvgGroup);
 
     // Change the graph direction
     d3.select('#toggle-button').on('click', function () {
@@ -202,22 +259,24 @@ function generate_dagre(data) {
 
         // Render the updated graph
         svg.selectAll('*').remove(); // Clear the existing SVG content
-        const svgGroup = svg.append('g');
+        currentSvgGroup = svg.append('g');
 
         // Create a zoom behavior
         const zoomChange = d3.zoom().on('zoom', (event) => {
-            svgGroup.attr('transform', event.transform);
+            currentSvgGroup.attr('transform', event.transform);
         });
 
         // Apply zoom to the SVG container
         svg.call(zoomChange);
 
-        const render = new dagreD3.render();
+        renderGraph(currentSvgGroup);
 
-        render(svgGroup, g);
-        tuneArrowheads(svgGroup);
-        addOnFunctionalities(svgGroup, g)
+    });
 
+    d3.select('#robot-toggle-button').on('click', function () {
+        showRobotClouds = !showRobotClouds;
+        renderRobotClouds(currentSvgGroup, g);
+        updateRobotToggleButton();
     });
 }
 

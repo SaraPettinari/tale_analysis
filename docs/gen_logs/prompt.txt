@@ -1,0 +1,231 @@
+You are generating synthetic event logs for process mining analysis of robotic systems.
+
+I need you to create synthetic event logs for robotic missions, possibly including both single-robot and multi-robot systems. The logs must be suitable for process mining and must support analysis from multiple perspectives: control-flow, performance, resource, spatial, battery, and inter-robot communication.
+
+Your task is to generate 5 different event logs, each representing a distinct robotic scenario. Some scenarios can involve a single robot, others a team of heterogeneous robots. The robots must be multi-purpose, meaning they can perform different kinds of activities depending on the mission.
+
+IMPORTANT REQUIREMENTS
+
+1. GENERAL GOAL
+- Generate realistic synthetic logs with many traces.
+- Each log must contain variability across traces.
+- Some logs should be “clean”, while some others should intentionally contain criticalities/anomalies so that process mining analysis reveals issues in behavior, communication, performance, or execution.
+- The final logs must be exportable in both CSV and XES format.
+
+2. REQUIRED FIELDS
+Each event must contain at least the following attributes:
+
+Traditional process mining fields:
+- case_id
+- concept:name
+- time:timestamp
+- lifecycle:transition
+
+Robot/process fields:
+- robot_id
+- org:resource
+- execution_id
+- state
+
+Robot status / spatial fields:
+- battery
+- x
+- y
+- z
+
+Communication fields:
+- msg_id
+- msg_payload
+- msg_role
+- msg_sender
+- msg_receiver
+
+If a field is not applicable, use null as a literal value (or empty value if the format requires it), except where otherwise specified below.
+
+3. LIFECYCLE MODELING
+All operational activities must be lifecycle-aware.
+
+For each activity execution:
+- the first event must have lifecycle:transition = start
+- intermediate events during the execution must have lifecycle:transition = null and state = inprogress
+- the last event must have lifecycle:transition = complete
+
+This applies also to communication receive activities:
+- even if a receive activity is conceptually atomic, it must still be represented with two events:
+  - one receive event with lifecycle:transition = start
+  - one receive event with lifecycle:transition = complete
+
+Lifecycle/state rules:
+- start events: lifecycle:transition = start, state = inprogress
+- intermediate events: lifecycle:transition = null, state = inprogress
+- complete events: lifecycle:transition = complete, state = done
+- if an activity is intentionally interrupted/aborted in anomalous traces, that must be explicitly modeled and described consistently
+
+4. TEMPORAL AND EXECUTION CONSISTENCY
+- Timestamps must be strictly ordered within each trace.
+- Activity durations must be realistic and variable.
+- Long-running activities (navigation, exploration, monitoring, transport, scanning, searching, spraying, etc.) must contain multiple intermediate in-progress events.
+- Short activities may have fewer intermediate events, but must still respect lifecycle consistency.
+- Battery must evolve over time, usually decreasing as the robot performs activities.
+- Position values x, y, z must evolve consistently during movement-related activities.
+- Ground robots should typically have z = 0.
+- Aerial robots may have z > 0.
+
+5. COMMUNICATION MODELING FOR MULTI-ROBOT SCENARIOS
+In multi-robot scenarios, communication must be explicitly represented and causally correlated.
+
+For each non-lost message:
+- there must be a send activity/event sequence on the sender side
+- there must be a corresponding receive activity/event sequence on the receiver side
+- sender and receiver must share the same msg_id
+- msg_sender and msg_receiver must be explicitly populated
+- send timestamp must be earlier than or equal to receive timestamp
+- receive must be represented as lifecycle-aware with start and complete
+- msg_role must clearly indicate send or receive
+
+Recommended naming:
+- send_<message_type>
+- receive_<message_type>
+
+Example:
+- send_task_assignment
+- receive_task_assignment
+
+For messages not involved in communication:
+- msg_id = null
+- msg_payload = null
+- msg_role = null
+- msg_sender = null
+- msg_receiver = null
+
+6. MESSAGE CORRELATION RULES
+The generated logs must satisfy the following:
+- every non-lost sent message must have a matching received message with the same msg_id
+- every matched receive must correspond to a prior send with the same msg_id
+- if communication anomalies are intentionally injected:
+  - lost message: send exists, receive missing
+  - duplicate message: one send, multiple receives sharing the same msg_id
+  - delayed message: receive occurs much later than usual
+- these anomalies must be intentional, sparse, and scenario-appropriate
+
+7. ROBOT IDENTITY / RESOURCES
+- robot_id identifies the specific robot instance, e.g., drone_1, ugv_2, arm_1
+- org:resource should represent either the same robot identifier or a meaningful robot type/category, depending on the scenario design, but be consistent within each log
+- In heterogeneous teams, include different robot types, e.g.:
+  - drone / UAV
+  - ground rover / UGV
+  - robotic arm
+  - agricultural sprayer
+  - warehouse AMR
+
+8. TRACE DESIGN
+- Each log must contain many traces.
+- Each trace represents one mission execution / order / incident / inspection / field task / delivery process, depending on the scenario.
+- Include variability in:
+  - path choices
+  - ordering of optional steps
+  - durations
+  - communication timing
+  - battery consumption
+  - occasional deviations or failures
+
+9. CRITICALITIES / ANOMALIES
+Some scenarios should intentionally contain process-relevant issues, such as:
+- low-battery returns
+- delays
+- bottlenecks
+- communication loss
+- duplicate messages
+- rerouting
+- waiting times
+- incomplete missions
+- aborted activities
+- overlapping work or coordination inefficiencies
+- repeated scans or repeated treatments
+- resource imbalance
+- handover delays
+- queueing effects
+
+These anomalies must still preserve structural plausibility and must be process-mining meaningful.
+
+10. OUTPUT FORMAT
+Produce:
+- one CSV file per scenario
+- one XES file per scenario
+- optionally, a summary file describing each scenario, number of traces, and injected criticalities
+
+The XES logs must follow a valid XES structure and include the event attributes above.
+
+11. SCENARIO DESIGN
+Create 5 scenarios. For each scenario, define:
+- scenario name
+- domain
+- robot types involved
+- main activities
+- communication patterns
+- possible anomalies
+- approximate number of traces
+
+Examples of possible domains:
+- warehouse logistics
+- smart agriculture
+- search and rescue
+- inspection and mapping
+- delivery and patrol
+- hospital logistics
+- industrial monitoring
+
+12. QUALITY CHECKS TO ENFORCE
+Before finalizing, verify:
+- all traces are timestamp-ordered
+- lifecycle rules are satisfied
+- complete events have state = done
+- intermediate execution events have lifecycle:transition = null and state = inprogress
+- all receive activities have both start and complete
+- non-lost messages have matching msg_id between send and receive
+- lost messages are the only unmatched sends
+- position and battery values evolve plausibly
+- all required columns/attributes are present
+
+13. DELIVERABLE STYLE
+Return:
+- the generated files
+- a concise summary of each scenario
+- a short explanation of the anomalies injected into each scenario
+- if useful, provide a compact schema description
+
+Now generate the logs according to these requirements.
+
+SCENARIO SET TO GENERATE:
+1. Single ground robot delivery and patrol
+- domain: indoor/outdoor delivery
+- robots: one ground rover
+- activities: boot, navigate, pickup, deliver, patrol, obstacle_avoidance, dock, recharge
+- anomalies: low battery, route deviation, temporary stop
+
+2. Single drone inspection and mapping
+- domain: aerial inspection
+- robots: one drone
+- activities: takeoff, ascend, navigate, inspect, hover, capture_image, map_area, replan, land
+- anomalies: delay between activities, repeated inspection, aborted navigation due to low battery
+
+3. Warehouse multi-robot pick-pack-handover
+- domain: warehouse logistics
+- robots: AMR + robotic arm
+- activities: receive_order, navigate_to_shelf, scan_bin, pick_item, handover_item, pack_order, dispatch
+- communication: task assignment, shelf confirmation, handover coordination
+- anomalies: handover delay, queue, lost/delayed messages
+
+4. Search-and-rescue UAV-UGV team
+- domain: rescue operations
+- robots: drone + ground rover
+- activities: dispatch, takeoff, scan_sector, detect_victim, send_coordinates, navigate_to_victim, stabilize_area, escort, mission_close
+- communication: victim coordinates, alerts, acknowledgments
+- anomalies: communication loss, rerouting, mission abort, delayed response
+
+5. Smart agriculture heterogeneous team
+- domain: precision agriculture
+- robots: drone scout + sprayer rover + supply rover
+- activities: survey_field, detect_patch, send_patch_coordinates, navigate_to_patch, spray_patch, request_refill, deliver_refill, resume_treatment, return_base
+- communication: detection reports, refill requests, treatment acknowledgments
+- anomalies: duplicate detections, delayed refill, resource imbalance, delayed communication

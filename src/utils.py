@@ -53,6 +53,7 @@ def create_generalized_dfg(file_path, is_performance=False):
                 * edges (list): A collection of edges in the graph
     '''
     log = xes_importer.apply(file_path)
+    activity_resources = get_activity_resources(log)
     
     # Discover the requested DFG
     if is_performance:
@@ -120,7 +121,13 @@ def create_generalized_dfg(file_path, is_performance=False):
                 n_check.add(node)
                 color = colors[node]
                 label = f"{activity_stats[node]}s" if is_performance else activity_stats[node]
-                nodes.append({'id': node, 'label': node, 'color': {'background': color}, 'count': label})
+                nodes.append({
+                    'id': node,
+                    'label': node,
+                    'color': {'background': color},
+                    'count': label,
+                    'resources': activity_resources.get(node, [])
+                })
 
         # Add edges
         if is_performance:
@@ -149,6 +156,28 @@ def get_edge_width(value, max_value, label=None, min_width=2, max_width=10):
 
     normalized_value = value / max_value
     return round(min_width + (normalized_value * (max_width - min_width)), 2)
+
+
+def get_activity_resources(log):
+    activity_resources = {}
+
+    for trace in log:
+        for event in trace:
+            activity = event.get(cn.ACTIVITY)
+            resource = event.get(cn.RESOURCE)
+
+            if activity is None or resource is None:
+                continue
+
+            if activity not in activity_resources:
+                activity_resources[activity] = set()
+
+            activity_resources[activity].add(str(resource))
+
+    return {
+        activity: sorted(resources)
+        for activity, resources in activity_resources.items()
+    }
 
 
 

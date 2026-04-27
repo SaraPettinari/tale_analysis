@@ -226,6 +226,25 @@ h1 {
   stroke-width: 4px;
 }
 
+.robot-cloud-bg {
+  fill: #fff8e8;
+  stroke: #d9a441;
+  stroke-width: 1.5px;
+}
+
+.robot-cloud-text {
+  fill: #7a4a00;
+  font-family: 'Tahoma', sans-serif;
+  font-size: 11px;
+  font-weight: bold;
+}
+
+#robot-toggle-button.active {
+  background-color: #f4c95d;
+  border-color: #d9a441;
+  color: #6b4300;
+}
+
 
 svg {
   width: 100%;

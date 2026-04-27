@@ -1,0 +1,24 @@
+Required event attributes:
+- case_id
+- concept:name
+- time:timestamp
+- lifecycle:transition
+- robot_id
+- org:resource
+- execution_id
+- state
+- battery
+- x
+- y
+- z
+- msg_id
+- msg_payload
+- msg_role
+- msg_sender
+- msg_receiver
+
+Lifecycle semantics:
+- start -> lifecycle:transition=start, state=inprogress
+- intermediate -> lifecycle:transition=null, state=inprogress
+- complete -> lifecycle:transition=complete, state=done
+- communication receives are always modeled with start and complete events
