@@ -5,6 +5,7 @@
 /utils
 /*env
 /.vscode
+*/eval_logs
 
 
 .DS_Store

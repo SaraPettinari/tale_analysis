@@ -59,6 +59,7 @@ def csv_processing():
     if file:
         if file.filename.endswith('csv'):
             file_path = os.path.join(ROOT_DIR, 'docs', 'logs', 'csv', file.filename)
+            os.makedirs(os.path.dirname(file_path), exist_ok=True)
             file.save(file_path)
             dest_name = csv_to_xes(file_path)
         return render_template(gui_interface, message = "Saved as: {dest_name}", dest_name = dest_name)
@@ -71,6 +72,7 @@ def choose_path():
     
     if f.filename.endswith('xes'):
         file_path = os.path.join(ROOT_DIR, 'docs', 'logs', f.filename)
+        os.makedirs(os.path.dirname(file_path), exist_ok=True)
         f.save(file_path)
         session['fdata'] = {}
         session[cn.FILE] = f.filename

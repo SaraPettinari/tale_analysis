@@ -134,6 +134,7 @@ def get_battery_plot(df):
                 hover_data={cn.ACTIVITY : True},
                 animation_frame=cn.CASE,
                 animation_group=cn.TIMESTAMP,
+                range_y=[0, 100],
                 title='Energy Consumption')
     
     fig_path = os.path.join(plot_path, out_file)
